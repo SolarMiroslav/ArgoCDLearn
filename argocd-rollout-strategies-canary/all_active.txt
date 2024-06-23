@@ -1,0 +1,5 @@
+argo-rollouts
+argocd
+default
+ingress-nginx
+kube-system

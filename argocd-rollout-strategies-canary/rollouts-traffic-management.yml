@@ -1,0 +1,63 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: rollouts-traffic-management
+spec:
+  replicas: 5
+  strategy:
+    canary:
+      dynamicStableScale: true # 2 pods will be terminating from revision 1
+      # abortScaleDownDelaySeconds: 20
+      canaryService: canary-service
+      stableService: stable-service
+      trafficRouting:
+        nginx:
+          stableIngress: rollouts-traffic-management
+      steps:
+      # - setWeight: 20 # Using Setweight Only
+      # - pause: {}
+      # ....................
+      - setCanaryScale: # Using SetCanaryScale with SetWeight
+          weight: 40 # 40 percent of 5 replicas  = 2 replicas
+          # replicas: 3  # Argo rollouts will create new rs with 3 replicas and 40% of traffic will be send there
+      - setWeight: 40 # 40 percent of trafic should be send to these 2 replicas from above
+      - pause: {}
+  selector:
+    matchLabels:
+      app: rollouts-traffic-management
+  template:
+    metadata:
+      labels:
+        app: rollouts-traffic-management
+    spec:
+      containers:
+      - name: rollouts-traffic-management
+        image: canary # This is the same image that we built in the previous session (v12-argo-rollouts-blue-green) , I just re-tagged it
+        imagePullPolicy: Never
+        env:
+        - name: html_name
+          value: "app-v2.html"
+        ports:
+        - containerPort: 5000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: canary-service
+spec:
+  ports:
+  - port: 5000
+    targetPort: 5000
+  selector:
+    app: rollouts-traffic-management
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: stable-service
+spec:
+  ports:
+  - port: 5000
+    targetPort: 5000
+  selector:
+    app: rollouts-traffic-management

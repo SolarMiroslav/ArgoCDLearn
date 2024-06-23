@@ -1,0 +1,17 @@
+# apiVersion: batch/v1
+# kind: Job
+# metadata:
+#   name: health-check-pre-job
+#   annotations:
+#     argocd.argoproj.io/hook: PreSync #run this job in presync phase before deploying applications
+#     argocd.argoproj.io/hook-delete-policy: HookFailed
+# spec:
+#   template:
+#     spec:
+#       containers:
+#         - name: health-check
+#           image: curlimages/curl
+#           command: ["/bin/sh", "-c"]
+#           args: ["if curl -s http://localhost:5000 | grep -qi 'running'; then echo 'Flask Application is up and Running'; exit 0; else echo 'Flask Application is NOT accessible'; exit 1; fi"]
+#       restartPolicy: Never
+#   backoffLimit: 0

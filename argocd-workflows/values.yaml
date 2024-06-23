@@ -1,0 +1,10 @@
+server:
+  extraArgs:
+    - --auth-mode=server
+  serviceType: NodePort
+  serviceNodePort: 30001
+  # ingess: 
+  #   enabled: true
+  #   ingressClassName: "nginx"
+  #   hosts:
+  #     - devops.hobbies

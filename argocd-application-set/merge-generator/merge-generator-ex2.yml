@@ -1,0 +1,53 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: merge-generator-environment-example
+spec:
+  generators:
+    - merge:
+        mergeKeys:
+          - environment
+        generators:
+          - clusters:
+              values:
+                replicas: '1'
+                tag: '1.23'
+                environment: 'pre-staging'
+          - clusters:
+              selector:
+                matchLabels:
+                  environment: 'pre-staging'
+              values:
+                replicas: '5'
+                tag: '1.24'
+                environment: 'pre-staging'
+          - clusters:
+              selector:
+                matchLabels:
+                  environment: 'production'
+              values:
+                replicas: '6'
+                tag: '1.25'
+                environment: 'production'
+  template:
+    metadata:
+      name: '{{values.environment}}-application'
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/devopshobbies/argocd-tutorial.git
+        targetRevision: main
+        path: v03-argocd-applications/helm/nginx
+        helm:
+          parameters:
+            - name: "image.tag"
+              value: '{{values.tag}}'
+            - name: "replicaCount"
+              value: '{{values.replicas}}'
+      destination:
+        server: '{{server}}'
+        namespace: '{{metadata.labels.environment}}'
+      syncPolicy:
+        automated: {}
+        syncOptions:
+          - CreateNamespace=true

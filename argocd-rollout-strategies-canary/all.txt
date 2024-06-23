@@ -1,0 +1,13 @@
+app-sync-phases
+argo-rollouts
+argocd
+blue-green
+canary
+default
+ingress-nginx
+kube-node-lease
+kube-public
+kube-system
+local
+nginx-ingress
+terraform

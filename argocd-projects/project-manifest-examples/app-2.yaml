@@ -1,0 +1,13 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: app-2
+spec:
+  destination:
+    namespace: default
+    server: https://kubernetes.default.svc
+  project: project-2
+  source:
+    path: argocd-applications/helm/nginx
+    repoURL: https://github.com/MiroslavSolar/ArgoCD.git
+    targetRevision: master
