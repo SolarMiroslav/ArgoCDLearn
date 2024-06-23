@@ -1,0 +1,16 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate # template will be used multiple times in different workflows
+metadata:
+  name: argo-wf-template 
+spec:
+  templates:
+  - name: container-template # Defining the "container template" as a Template Definition
+    inputs:
+      parameters:
+        - name: message
+          # value: "hello from input message"
+    container:
+      image: alpine
+      command: ["/bin/sh", "-c"]
+      args: ["echo {{ inputs.parameters.message }}"]
+  
